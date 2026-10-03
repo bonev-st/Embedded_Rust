@@ -54,5 +54,9 @@ Run `cargo` from this folder (`cd l562-rtt-demo`), so `.cargo/config.toml` is us
 | --- | --- |
 | Green LED never lights | Usually `PWR_CR2.IOSV` isn't set. It is in this demo; check the board's VDDIO2 jumpers if it still fails. |
 | Flashing fails at `0x08000000` | TrustZone is probably on, see [TrustZone (TZEN)](../README.md#trustzone-tzen). |
+| Breakpoint stays hollow, hover says *"Cannot set breakpoint here… reduce optimization"* | The debug build used `opt-level = 1`, which removed the breakpoint locations from more than half of the lines. `Cargo.toml` now builds this crate with `opt-level = 0` and only the dependencies with `opt-level = "s"` (`[profile.dev.package."*"]`), so every code line takes a breakpoint. |
+| More than 8 breakpoints, the extra ones stay hollow | The Cortex-M33 has 8 hardware breakpoints. Remove some. |
+| `SwdApFault` / `UNWIND: Error while checking for exception context` at the first stop | Harmless. probe-rs tries to unwind the stack at the reset halt (`haltAfterReset: true`). Press Continue. |
+| Breakpoints stop working after renaming the lab folder | The binary still points to the old source path. Run `cargo clean` once. |
 
 Probe and container problems are in the [top-level troubleshooting](../README.md#troubleshooting).

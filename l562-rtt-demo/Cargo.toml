@@ -19,7 +19,11 @@ bench = false
 
 [profile.dev]
 debug = 2
-opt-level = 1      # keeps debug builds small and still steppable
+opt-level = 0      # every source line keeps a breakpoint location (opt-level 1 dropped more than half)
+
+# dependencies (cortex-m, defmt, PAC) stay optimized: smaller binary, nobody steps into them
+[profile.dev.package."*"]
+opt-level = "s"
 
 [profile.release]
 codegen-units = 1
