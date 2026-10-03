@@ -16,7 +16,8 @@ dev_dd/
 ├── .devcontainer/          one container for all labs
 ├── scripts/                ST-LINK attach (Windows), TZEN tools, Claude restore
 ├── labs.code-workspace     opens every lab as its own VS Code folder
-└── l562-rtt-demo/    one folder per lab, each a standalone Cargo project
+├── LICENSE                 MIT
+└── l562-rtt-demo/          one folder per lab, each a standalone Cargo project
 ```
 
 Each lab has its own `.cargo/config.toml` (target, runner/chip), `memory.x`, `.vscode/launch.json` and `README.md`, so labs for different chips can live side by side. They are deliberately **not** one Cargo workspace.
@@ -119,3 +120,9 @@ What we learned clearing it on this board:
 - Booting with **BOOT0 high** (system bootloader) avoids the lockup; ST describes the procedure in [How to disable TrustZone in STM32L5xx devices](https://wiki.st.com/stm32mcu/wiki/Security:How_to_disable_TrustZone_in_STM32L5xx_devices_during_development_phase).
 
 <!-- TODO: add the exact steps that finally cleared TZEN on this board -->
+
+## License
+
+[MIT](LICENSE), covering all labs and scripts in this repository.
+
+Exception: `.vscode/STM32L562.svd` in the labs is copied from STMicroelectronics' STM32CubeCLT and stays under ST's own license terms.
