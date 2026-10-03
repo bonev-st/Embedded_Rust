@@ -1,0 +1,7 @@
+{
+  // Needed on the Windows side to open this folder in WSL and then in the dev container
+  "recommendations": [
+    "ms-vscode-remote.remote-wsl",
+    "ms-vscode-remote.remote-containers"
+  ]
+}

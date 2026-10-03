@@ -1,0 +1,72 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Build, flash, halt at reset; defmt/RTT output appears in a terminal tab
+      "name": "L562: Flash & Debug (probe-rs + RTT)",
+      "type": "probe-rs-debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "cargo build",
+      "chip": "STM32L562QE",
+      "flashingConfig": {
+        "flashingEnabled": true,
+        "haltAfterReset": true
+      },
+      "coreConfigs": [
+        {
+          "coreIndex": 0,
+          "programBinary": "${workspaceFolder}/target/thumbv8m.main-none-eabihf/debug/l562-rtt-demo",
+          "svdFile": "${workspaceFolder}/.vscode/STM32L562.svd",
+          "rttEnabled": true,
+          "rttChannelFormats": [
+            { "channelNumber": 0, "dataFormat": "Defmt", "showTimestamps": true, "showLocation": true }
+          ]
+        }
+      ]
+    },
+    {
+      // Same, but for the optimized release build
+      "name": "L562: Flash & Debug release (probe-rs + RTT)",
+      "type": "probe-rs-debug",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "cargo build --release",
+      "chip": "STM32L562QE",
+      "flashingConfig": {
+        "flashingEnabled": true,
+        "haltAfterReset": false
+      },
+      "coreConfigs": [
+        {
+          "coreIndex": 0,
+          "programBinary": "${workspaceFolder}/target/thumbv8m.main-none-eabihf/release/l562-rtt-demo",
+          "svdFile": "${workspaceFolder}/.vscode/STM32L562.svd",
+          "rttEnabled": true,
+          "rttChannelFormats": [
+            { "channelNumber": 0, "dataFormat": "Defmt", "showTimestamps": true }
+          ]
+        }
+      ]
+    },
+    {
+      // Attach to the running firmware without flashing (RTT continues)
+      "name": "L562: Attach (probe-rs + RTT)",
+      "type": "probe-rs-debug",
+      "request": "attach",
+      "cwd": "${workspaceFolder}",
+      "chip": "STM32L562QE",
+      "coreConfigs": [
+        {
+          "coreIndex": 0,
+          "programBinary": "${workspaceFolder}/target/thumbv8m.main-none-eabihf/debug/l562-rtt-demo",
+          "svdFile": "${workspaceFolder}/.vscode/STM32L562.svd",
+          "rttEnabled": true,
+          "rttChannelFormats": [
+            { "channelNumber": 0, "dataFormat": "Defmt", "showTimestamps": true }
+          ]
+        }
+      ]
+    }
+  ]
+}

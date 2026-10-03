@@ -1,0 +1,41 @@
+{
+  "name": "STM32L562E-DK RTT demo",
+  "build": { "dockerfile": "Dockerfile", "context": "." },
+
+  // USB access to the ST-LINK attached to WSL with usbipd.
+  // The bind mount follows re-enumeration (reset/replug); --privileged also exposes
+  // /dev/ttyACM0 (Virtual COM port) if the board was attached before the container started.
+  "runArgs": ["--privileged", "-v", "/dev/bus/usb:/dev/bus/usb"],
+
+  // root avoids USB permission problems (no udev rules needed)
+  "remoteUser": "root",
+
+  // keep downloaded crates and Claude Code chats/settings between container rebuilds
+  "mounts": [
+    "source=l562-cargo-registry,target=/root/.cargo/registry,type=volume",
+    "source=l562-cargo-git,target=/root/.cargo/git,type=volume",
+    "source=l562-claude,target=/root/.claude,type=volume"
+  ],
+
+  // keeps ~/.claude.json inside the volume too
+  "containerEnv": { "CLAUDE_CONFIG_DIR": "/root/.claude" },
+
+  "postCreateCommand": {
+    "stlink": "lsusb | grep -i -E 'stlink|0483:374' || echo 'ST-LINK not visible - run scripts/attach-stlink.ps1 on Windows'",
+    "claude": "bash scripts/restore-claude.sh"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "probe-rs.probe-rs-debugger",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        // no_std: there is no `test` crate, so do not check test/bench targets
+        "rust-analyzer.check.allTargets": false
+      }
+    }
+  }
+}

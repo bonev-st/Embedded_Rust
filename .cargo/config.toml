@@ -1,0 +1,17 @@
+[build]
+target = "thumbv8m.main-none-eabihf"   # Cortex-M33 with FPU (STM32L562)
+
+# Matches every bare-metal ARM target. A `[target.<triple>]` table would also work
+# unquoted, but a quoted triple containing a dot is silently ignored by cargo.
+[target.'cfg(all(target_arch = "arm", target_os = "none"))']
+# `cargo run` = build + flash + reset + print defmt/RTT logs in the terminal
+runner = "probe-rs run --chip STM32L562QE"
+rustflags = [
+  "-C", "link-arg=--nmagic",
+  "-C", "link-arg=-Tlink.x",    # cortex-m-rt linker script (uses memory.x)
+  "-C", "link-arg=-Tdefmt.x",   # defmt sections
+]
+
+[env]
+# Log filter: trace | debug | info | warn | error
+DEFMT_LOG = "debug"

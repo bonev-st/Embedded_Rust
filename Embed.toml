@@ -1,0 +1,9 @@
+# Configuration for `cargo embed` (flash + RTT terminal UI)
+[default.general]
+chip = "STM32L562QE"
+
+[default.rtt]
+enabled = true
+
+[default.gdb]
+enabled = false

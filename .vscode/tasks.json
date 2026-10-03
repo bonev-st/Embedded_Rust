@@ -1,0 +1,56 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "cargo build",
+      "type": "shell",
+      "command": "cargo build",
+      "problemMatcher": ["$rustc"],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "cargo build --release",
+      "type": "shell",
+      "command": "cargo build --release",
+      "problemMatcher": ["$rustc"],
+      "group": "build"
+    },
+    {
+      "label": "run: flash + RTT log (cargo run)",
+      "type": "shell",
+      "command": "cargo run",
+      "problemMatcher": ["$rustc"],
+      "isBackground": false
+    },
+    {
+      "label": "flash only (release)",
+      "type": "shell",
+      "command": "cargo flash --chip STM32L562QE --release",
+      "problemMatcher": ["$rustc"]
+    },
+    {
+      "label": "probe: list connected probes",
+      "type": "shell",
+      "command": "lsusb | grep -i -E 'stlink|0483:374'; probe-rs list",
+      "problemMatcher": []
+    },
+    {
+      "label": "probe: chip erase",
+      "type": "shell",
+      "command": "probe-rs erase --chip STM32L562QE",
+      "problemMatcher": []
+    },
+    {
+      "label": "serial: VCP terminal (115200)",
+      "type": "shell",
+      "command": "picocom -b 115200 /dev/ttyACM0",
+      "problemMatcher": []
+    },
+    {
+      "label": "size",
+      "type": "shell",
+      "command": "cargo size --release -- -A",
+      "problemMatcher": ["$rustc"]
+    }
+  ]
+}
