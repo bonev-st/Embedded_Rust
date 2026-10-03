@@ -1,0 +1,19 @@
+{
+  // Open inside the container: File > Open Workspace from File... > labs.code-workspace
+  // Each lab is its own folder, so its .vscode/launch.json (F5) and tasks.json work.
+  // Add a new lab to "folders" and "files.exclude" after copying a lab folder.
+  "folders": [
+    // keep "." first: Claude Code starts in the first folder, and its chat history
+    // is stored per start folder (/workspaces/dev_dd)
+    { "name": "dev_dd (container & scripts)", "path": "." },
+    { "name": "L562 RTT demo", "path": "l562-rtt-demo" }
+  ],
+  "settings": {
+    // hide the lab folders inside "dev_dd", they have their own entries
+    "files.exclude": {
+      "l562-rtt-demo/": true
+    },
+    // no_std: there is no `test` crate, so do not check test/bench targets
+    "rust-analyzer.check.allTargets": false
+  }
+}

@@ -1,6 +1,6 @@
-# STM32L562E-DK RTT demo (VS Code + dev container)
+# Embedded Rust labs (VS Code + dev container)
 
-This is a test project for the STM32L562E-DK. The on-board **STLINK-V3E** is passed through to a Docker dev container, and **probe-rs** in the container flashes and debugs the board and shows **defmt/RTT** logs.
+One Docker dev container for all Rust labs on the STM32L562E-DK (and the course's other Cortex-M boards). The on-board **STLINK-V3E** is passed through to the container, and **probe-rs** in the container flashes and debugs the board and shows **defmt/RTT** logs.
 
 ```text
 Windows ── usbipd-win ──► WSL2 Ubuntu-22.04 ── Docker Engine ──► dev container
@@ -9,29 +9,21 @@ Windows ── usbipd-win ──► WSL2 Ubuntu-22.04 ── Docker Engine ─�
 
 The full background is in `../DevContainer_STM32L562E-DK.md`.
 
-## What the demo does
-
-| Board part | Behaviour |
-| --- | --- |
-| Red LED LD9 (PD3) | Heartbeat, toggles every 500 ms. Logged at `trace` level. |
-| Green LED LD10 (PG12) | On while the button is held. Shows the VDDIO2/`PWR_CR2.IOSV` setup. |
-| USER button B2 (PC13) | Each press and release is logged. Every 5th press logs a `warn`. **Holding it for 3 s triggers a demo panic.** |
-| RTT log | Timestamped (ms) lines at all defmt levels, a `#[derive(Format)]` struct every second, an array and a register value in hex. |
-
-Expected output of `cargo run`:
+## Layout
 
 ```text
-      Erasing ✔ ...
-  Programming ✔ ...
-==== STM32L562E-DK RTT demo ====
-0.000 INFO  core clock 4000000 Hz (MSI reset default)
-0.000 INFO  GPIO ready: LD9=PD3 (heartbeat), LD10=PG12 (button), B2=PC13
-1.000 INFO  Status { uptime_ms: 1000, presses: 0, button: Released, heartbeat_on: false }
-1.000 DEBUG GPIOD ODR = 0x00000008, PD3 high = true
-2.315 INFO  button pressed (#1)
-2.315 DEBUG last presses at [0, 0, 0, 2315] ms
-2.480 DEBUG button released after 165 ms
+dev_dd/
+├── .devcontainer/          one container for all labs
+├── scripts/                ST-LINK attach (Windows), TZEN tools, Claude restore
+├── labs.code-workspace     opens every lab as its own VS Code folder
+└── l562-rtt-demo/    one folder per lab, each a standalone Cargo project
 ```
+
+Each lab has its own `.cargo/config.toml` (target, runner/chip), `memory.x`, `.vscode/launch.json` and `README.md`, so labs for different chips can live side by side. They are deliberately **not** one Cargo workspace.
+
+| Lab | Board | What it shows |
+| --- | --- | --- |
+| [l562-rtt-demo](l562-rtt-demo/README.md) | STM32L562E-DK | GPIO, button, defmt/RTT logging, panic handling, debugging |
 
 ## Prerequisites (one-time)
 
@@ -39,7 +31,7 @@ Expected output of `cargo run`:
 2. **VS Code extensions on Windows:** *WSL* and *Dev Containers*.
 3. **usbipd-win:** already installed (5.3).
 
-## Steps
+## Setup
 
 ### 1. Copy the project into the WSL filesystem
 
@@ -66,34 +58,35 @@ If PowerShell refuses to run the script, use `powershell -ExecutionPolicy Bypass
 
 Press `F1` and run **Dev Containers: Reopen in Container**. The first build takes about 5 to 10 minutes. Attach the board **before** this step if you want `/dev/ttyACM0` (the VCP) inside the container.
 
-### 4. Check the probe
+### 4. Open the labs workspace
 
-Run the task **probe: list connected probes**, or in the terminal:
+In the container: **File → Open Workspace from File… → `labs.code-workspace`**. Each lab now shows up as its own folder, and `F5` offers that lab's debug configurations. (If you open only the `dev_dd` folder, `cargo` still works from a lab's terminal, but `F5` finds no configurations.)
+
+### 5. Check the probe
 
 ```bash
 probe-rs list        # [0]: STLINK-V3 -- 0483:374e:...
 ```
 
-### 5. Run the demo
+Then continue in the lab's README, for example [l562-rtt-demo](l562-rtt-demo/README.md).
 
-- **Terminal:** `cargo run` builds, flashes and streams the RTT log. Stop it with Ctrl+C. `cargo embed` gives the same in a terminal UI.
-- **Debugger:** press `F5` with **L562: Flash & Debug (probe-rs + RTT)**. It stops at reset; press Continue. The RTT channel opens as a terminal tab in VS Code. Breakpoints, stepping and the peripheral view (from `.vscode/STM32L562.svd`) all work.
-- **More log detail:** set `DEFMT_LOG = "trace"` in `.cargo/config.toml` to see the heartbeat lines. The filter is applied when the firmware is compiled, so rebuild afterwards.
-- **Panic demo:** hold B2 for 3 s. probe-rs prints the panic message and a backtrace, then the core stays halted. Reset or re-flash to continue.
+## Adding a new lab
 
-## Files
+1. Copy an existing lab: `cp -r l562-rtt-demo <new-lab>` (skip its `target/` folder if there is one).
+2. In the copy, change `name` (package and `[[bin]]`) in `Cargo.toml`, and the binary path `.../debug/<name>` and `.../release/<name>` in `.vscode/launch.json`.
+3. For another chip, change `target` and the `--chip` of the runner in `.cargo/config.toml`, `memory.x`, `Embed.toml`, `chip` and `svdFile` in `launch.json`, and the PAC/HAL crate in `Cargo.toml`. The container already has the `thumbv8m.main-none-eabihf`, `thumbv7em-none-eabihf` and `thumbv7m-none-eabi` targets.
+4. Add the folder to `folders` and `files.exclude` in `labs.code-workspace`, and a row to the table above.
+5. Run `cargo` commands **from inside the lab folder**, since that is where its `.cargo/config.toml` is picked up.
+
+## Container files
 
 | File | Purpose |
 | --- | --- |
-| `.devcontainer/Dockerfile` | Ubuntu 24.04, Rust stable, Cortex-M targets (several side by side), probe-rs, gdb-multiarch, picocom, OpenOCD. |
-| `.devcontainer/devcontainer.json` | USB passthrough (`--privileged`, `/dev/bus/usb`), extensions, cargo cache volumes. |
-| `.cargo/config.toml` | Default target `thumbv8m.main-none-eabihf`, `probe-rs run` runner, linker scripts, `DEFMT_LOG`. |
-| `memory.x` | 512K flash @ `0x08000000`, 256K RAM @ `0x20000000` (TrustZone off). |
-| `Embed.toml` | `cargo embed` settings (RTT on). |
-| `.vscode/launch.json` | probe-rs: debug, release debug, attach. All with the RTT defmt channel. |
-| `.vscode/tasks.json` | Build, run, flash, list probes, erase, VCP terminal, size. |
-| `.vscode/STM32L562.svd` | Copied from STM32CubeCLT 1.18 (`STMicroelectronics_CMSIS_SVD`). |
-| `scripts/attach-stlink.ps1` | Finds the STLINK-V3E and binds/attaches it with usbipd. |
+| `.devcontainer/Dockerfile` | Ubuntu 24.04, Rust stable, Cortex-M targets (several side by side), probe-rs, cargo-binutils, gdb-multiarch, picocom, OpenOCD. |
+| `.devcontainer/devcontainer.json` | USB passthrough (`--privileged`, `/dev/bus/usb`), extensions, volumes for the cargo cache and Claude Code data. |
+| `scripts/attach-stlink.ps1` | Finds the STLINK-V3E and binds/attaches it with usbipd (run on Windows). |
+| `scripts/restore-claude.sh` | Restores Claude Code chats from `.claude-backup/` into a fresh volume after a rebuild. |
+| `scripts/clear-tzen.tcl` | OpenOCD attempt at the RDP 1 → 0 regression with `TZEN=0`. **Did not work on this board**, see below. |
 
 ## Troubleshooting
 
@@ -102,34 +95,27 @@ probe-rs list        # [0]: STLINK-V3 -- 0483:374e:...
 | `probe-rs list` is empty | Run `attach-stlink.ps1` again and check `lsusb` in WSL. Rebuild the container if `devcontainer.json` changed. |
 | `Probe firmware is outdated` | `usbipd detach --busid <id>`, run `C:\ST\STM32CubeCLT_1.18.0\STLinkUpgrade.bat`, then attach again. |
 | No RTT output in VS Code | Make sure `rttEnabled` is true and the binary was built from this source. With `haltAfterReset: true`, press Continue. |
-| `program_page failed with code 1` at `0x08000000`, or a SecureFault | TrustZone is on (ST's demo enables it). Check with `probe-rs read --chip STM32L562QE b32 0x40022040 1`: bit 31 set means `TZEN=1`. Clear it from the container with OpenOCD (**mass-erases flash**), see [Clearing TrustZone (TZEN)](#clearing-trustzone-tzen). |
-| Green LED never lights | Usually `PWR_CR2.IOSV` isn't set. It is in this demo; check the board's VDDIO2 jumpers if it still fails. |
+| `program_page failed with code 1` at `0x08000000`, or a SecureFault | TrustZone is on (ST's demo enables it), see [TrustZone (TZEN)](#trustzone-tzen). |
+| `F5` shows no configurations | Open `labs.code-workspace` instead of the plain folder. |
 | Windows COM port or CubeProgrammer lost the board | Expected while it is attached to WSL. Use `usbipd detach --busid <id>`. |
 
-## Clearing TrustZone (TZEN)
+## TrustZone (TZEN)
 
-ST's out-of-box demo ships with TrustZone enabled (`TZEN=1`). This project is built for a non-secure-only chip, so flashing fails until TZEN is cleared. OpenOCD in the container does this over the ST-LINK.
+ST's out-of-box demo ships with TrustZone enabled (`TZEN=1`). The labs are built for a non-secure-only chip, so flashing fails until TZEN is cleared.
 
-> **Warning:** TZEN can only be cleared during an RDP regression (level 1 → 0), which **mass-erases the whole flash**.
+Check the state (read-only):
 
-1. Stop anything else that uses the probe (probe-rs debug session, `cargo run`, `cargo embed`).
-2. Check the current state (read-only):
+```bash
+openocd -f interface/stlink.cfg -f target/stm32l5x.cfg \
+  -c init -c "stm32l4x trustzone 0" -c shutdown
+```
 
-   ```bash
-   openocd -f interface/stlink.cfg -f target/stm32l5x.cfg \
-     -c init -c "stm32l4x trustzone 0" -c shutdown
-   ```
+`TZEN = 1 : TrustZone enabled by option bytes` means it has to be cleared. `probe-rs read --chip STM32L562QE b32 0x40022040 1` shows the same: bit 31 set means `TZEN=1`.
 
-   `TZEN = 1 : TrustZone enabled by option bytes` means it has to be cleared. The warning `The selected adapter does not support debugging this device in secure mode` is expected and harmless here.
+What we learned clearing it on this board:
 
-3. Clear TZEN (erases flash):
+- TZEN can only be cleared during an RDP regression (level 1 → 0), which **mass-erases the whole flash**. OpenOCD's `stm32l4x trustzone 0 disable` refuses to do this on its own.
+- At RDP level 1 with `TZEN=1`, SWD only works while the CPU is in the non-secure state. With an empty or invalid flash the core locks up in the secure world and the debugger cannot reach the option bytes. **Do not raise RDP to level 1 unless you know the regression path works.**
+- Booting with **BOOT0 high** (system bootloader) avoids the lockup; ST describes the procedure in [How to disable TrustZone in STM32L5xx devices](https://wiki.st.com/stm32mcu/wiki/Security:How_to_disable_TrustZone_in_STM32L5xx_devices_during_development_phase).
 
-   ```bash
-   openocd -f interface/stlink.cfg -f target/stm32l5x.cfg \
-     -c init -c "stm32l4x trustzone 0 disable" -c shutdown
-   ```
-
-4. Run step 2 again. It should now report `TZEN = 0` and `RDP level 0 (0xAA)`. The same check with probe-rs: `probe-rs read --chip STM32L562QE b32 0x40022040 1` must have bit 31 clear.
-5. Flash as usual with `cargo run`.
-
-If OpenOCD can't connect after the regression, power-cycle the board (unplug/replug USB, then run `attach-stlink.ps1` again on Windows).
+<!-- TODO: add the exact steps that finally cleared TZEN on this board -->
