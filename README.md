@@ -29,18 +29,38 @@ Each lab has its own `.cargo/config.toml` (target, runner/chip), `memory.x`, `.v
 | --- | --- | --- |
 | [l562-rtt-demo](l562-rtt-demo/README.md) | STM32L562E-DK | GPIO, button, defmt/RTT logging, panic handling, debugging |
 | [hello_world](hello_world) | PC (in the container) | Lab 1: first Rust program |
-| [100-exercises-to-learn-rust](100-exercises-to-learn-rust) | PC (in the container) | Lab 2: [100 Exercises To Learn Rust](https://rust-exercises.com/100-exercises/), see [below](#100-exercises-to-learn-rust) |
+| [100-exercises-to-learn-rust](100-exercises-to-learn-rust) | PC (in the container) | Lab 2: [100 Exercises To Learn Rust](https://rust-exercises.com/100-exercises/), see [below](#lab-2-100-exercises-to-learn-rust) |
 
-## 100 Exercises To Learn Rust
+## Lab 2: 100 Exercises To Learn Rust
 
 Mainmatter's course ([book](https://rust-exercises.com/100-exercises/01_intro/00_welcome), [repo](https://github.com/mainmatter/100-exercises-to-learn-rust)). It runs on the PC, not on the board. Everything it needs is in the container: stable Rust, `rust-analyzer` and the workshop runner `wr`.
 
-**Working on it**
+### How to start
 
-```bash
-cd 100-exercises-to-learn-rust
-wr          # checks your solutions and opens the next exercise
-```
+1. **Open the course workspace:** File → Open Workspace from File… → `workspaces/100-exercises.code-workspace`.
+2. **Start the runner** in a terminal (Terminal → New Terminal):
+
+   ```bash
+   cd /workspaces/dev_dd/100-exercises-to-learn-rust
+   wr
+   ```
+
+   It asks: *"Do you want to open the next exercise, (01) intro - (00) welcome? [y/n]"*. Answer **y**.
+3. **Read the matching chapter in the book:** [rust-exercises.com/100-exercises/01_intro/00_welcome](https://rust-exercises.com/100-exercises/01_intro/00_welcome). The book chapters and the exercise folders have the same names, for example `01_intro/00_welcome`.
+4. **Solve the exercise:** open `exercises/01_intro/00_welcome/src/lib.rs`. Everything you need to change is marked with `TODO`, `todo!()` or `__`. The tests at the bottom of the file show what the result has to be. Save the file.
+5. **Check it:** run `wr` again.
+   - Tests fail: read the message, fix the code, and run `wr` again.
+   - Tests pass: it asks to open the next exercise. Answer **y** and continue with step 3.
+6. **Save your work to your repo** every few exercises:
+
+   ```bash
+   cd /workspaces/dev_dd
+   git add 100-exercises-to-learn-rust/exercises
+   git commit -m "Solve 01_intro"
+   git push
+   ```
+
+### Notes
 
 `wr` needs the `.wr.toml` in the `dev_dd` root: it looks for its config in the git root, and that file points it at `100-exercises-to-learn-rust/exercises`. Run `wr` from inside `100-exercises-to-learn-rust/` (not from a lab folder, whose `.cargo/config.toml` would switch to the embedded target).
 
