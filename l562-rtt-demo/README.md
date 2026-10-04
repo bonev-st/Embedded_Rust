@@ -31,7 +31,7 @@ Expected output of `cargo run`:
 Run `cargo` from this folder (`cd l562-rtt-demo`), so `.cargo/config.toml` is used.
 
 - **Terminal:** `cargo run` builds, flashes and streams the RTT log. Stop it with Ctrl+C. `cargo embed` gives the same in a terminal UI.
-- **Debugger:** with `labs.code-workspace` open, press `F5` and pick **L562: Flash & Debug (probe-rs + RTT)**. It stops at reset; press Continue. The RTT channel opens as a terminal tab in VS Code. Breakpoints, stepping and the peripheral view (from `.vscode/STM32L562.svd`) all work. Stop any `cargo run` first, only one tool can use the probe.
+- **Debugger:** with `workspaces/l562-rtt-demo.code-workspace` open, press `F5` and pick **L562: Flash & Debug (probe-rs + RTT)**. It stops at reset; press Continue. The RTT channel opens as a terminal tab in VS Code. Breakpoints, stepping and the peripheral view (from `.vscode/STM32L562.svd`) all work. Stop any `cargo run` first, only one tool can use the probe.
 - **More log detail:** set `DEFMT_LOG = "trace"` in `.cargo/config.toml` to see the heartbeat lines. The filter is applied when the firmware is compiled, so rebuild afterwards.
 - **Panic demo:** hold B2 for 3 s. probe-rs prints the panic message and a backtrace, then the core stays halted. Reset or re-flash to continue.
 

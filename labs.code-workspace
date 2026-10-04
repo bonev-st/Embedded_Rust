@@ -7,13 +7,15 @@
     // is stored per start folder (/workspaces/dev_dd)
     { "name": "dev_dd (container & scripts)", "path": "." },
     { "name": "L562 RTT demo", "path": "l562-rtt-demo" },
-    { "name": "Lab 1", "path": "hello_world" }
+    { "name": "Lab 1", "path": "hello_world" },
+    { "name": "Lab 2 - 100 Exercises To Learn Rust", "path": "100-exercises-to-learn-rust" }
   ],
   "settings": {
     // hide the lab folders inside "dev_dd", they have their own entries
     "files.exclude": {
       "l562-rtt-demo/": true,
       "hello_world/": true,
+      "100-exercises-to-learn-rust/": true
     },
     // no_std: there is no `test` crate, so do not check test/bench targets
     "rust-analyzer.check.allTargets": false

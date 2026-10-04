@@ -1,0 +1,18 @@
+{
+  // One lab per workspace: F5 and Run Task show only this lab's launch.json/tasks.json.
+  // Open: File > Open Workspace from File... (switching labs keeps the same container)
+  "folders": [
+    // keep the dev_dd root first: Claude Code starts in the first folder,
+    // so all labs share one chat history (/workspaces/dev_dd)
+    { "name": "dev_dd", "path": ".." },
+    { "name": "L562 RTT demo", "path": "../l562-rtt-demo" }
+  ],
+  "settings": {
+    // the lab has its own entry above
+    "files.exclude": { "l562-rtt-demo/": true },
+    // rust-analyzer loads only this lab, not every project under dev_dd
+    "rust-analyzer.linkedProjects": ["/workspaces/dev_dd/l562-rtt-demo/Cargo.toml"],
+    // no_std: there is no `test` crate, so do not check test/bench targets
+    "rust-analyzer.check.allTargets": false
+  }
+}

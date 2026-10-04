@@ -27,12 +27,20 @@
 
   "customizations": {
     "vscode": {
+      // installed automatically in every (re)built container
       "extensions": [
         "rust-lang.rust-analyzer",
         "probe-rs.probe-rs-debugger",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "Anthropic.claude-code",
+        "ms-vscode.cpptools",
+        "mhutchie.git-graph",
+        "marus25.cortex-debug"
       ],
       "settings": {
+        // Cortex-Debug: use the container's gdb-multiarch (there is no arm-none-eabi-gdb)
+        "cortex-debug.gdbPath": "gdb-multiarch",
+        "cortex-debug.openocdPath": "/usr/bin/openocd",
         // no_std: there is no `test` crate, so do not check test/bench targets
         "rust-analyzer.check.allTargets": false
       }

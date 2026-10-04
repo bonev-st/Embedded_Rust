@@ -30,10 +30,13 @@ RUN rustup target add thumbv8m.main-none-eabihf thumbv7em-none-eabihf thumbv7m-n
 RUN curl --proto '=https' --tlsv1.2 -LsSf \
       https://github.com/probe-rs/probe-rs/releases/latest/download/probe-rs-tools-installer.sh | sh
 
-# cargo-binutils (cargo size / cargo objdump / cargo objcopy) as a prebuilt binary
+# Prebuilt binaries via cargo-binstall:
+#   cargo-binutils   cargo size / cargo objdump / cargo objcopy
+#   workshop-runner  `wr`, checks the exercises in 100-exercises-to-learn-rust
 RUN curl -L --proto '=https' --tlsv1.2 -sSf \
       https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash && \
-    cargo binstall -y cargo-binutils
+    cargo binstall -y cargo-binutils && \
+    cargo binstall -y --locked workshop-runner
 
 WORKDIR /workspaces
 CMD ["/bin/bash"]

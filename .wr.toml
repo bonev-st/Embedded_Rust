@@ -1,0 +1,4 @@
+# Config for the workshop runner `wr` (100 Exercises To Learn Rust).
+# wr reads this file from the git root, which is dev_dd (the course is a git subtree),
+# so it points wr at the course's exercises folder. Paths are relative to dev_dd.
+exercises_dir = "100-exercises-to-learn-rust/exercises"
